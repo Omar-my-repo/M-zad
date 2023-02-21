@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:mzady/provider/main_provider.dart';
+import 'package:mzady/screens/favorites/favorites_screen.dart';
 import 'package:mzady/screens/home/home_screen.dart';
 import 'package:mzady/screens/search/search_screen.dart';
-import 'package:mzady/screens/settings/settings_screen.dart';
+import 'package:mzady/screens/settings/profile_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:provider/provider.dart';
 
 import '../add_item_screen/add_item_screen.dart';
 
@@ -19,7 +23,18 @@ class _HomeLayoutState extends State<HomeLayout> {
       PersistentTabController(initialIndex: 0);
 
   @override
+  void initState() {
+    super.initState();
+    FlutterNativeSplash.remove();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<MainProvider>(context, listen: false);
+    if (provider.user == null) provider.initUserManually();
+    // provider.getAdminID();
+    if (provider.isDataLoaded == false) provider.getLocalProducts();
+    print('=====Home layout build');
     return Scaffold(
       body: PersistentTabView(
         context,
@@ -65,8 +80,14 @@ class _HomeLayoutState extends State<HomeLayout> {
       HomeScreen(),
       SearchScreen(),
       AddItemScreen(),
-      Container(color: Colors.redAccent),
-      SettingsScreen(),
+      FavoritesScreen(),
+      ProfileScreen(),
+
+      // Container(color: Colors.cyanAccent,child:Center(child: Text('Home Screen',style: TextStyle(fontSize:16),),)),
+      // Container(color: Colors.lightBlueAccent,child:Center(child: Text('Search Screen',style: TextStyle(fontSize:16),),)),
+      // Container(color: Colors.redAccent,child:Center(child: Text('Add Product',style: TextStyle(fontSize:16),),)),
+      // Container(color: Colors.yellowAccent,child:Center(child: Text('Favorites',style: TextStyle(fontSize:16),),)),
+      // Container(color: Colors.greenAccent,child:Center(child: Text('Settings',style: TextStyle(fontSize:16),),)),
     ];
   }
 
@@ -100,8 +121,8 @@ class _HomeLayoutState extends State<HomeLayout> {
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),
       PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.settings),
-        title: ("Settings"),
+        icon: const Icon(CupertinoIcons.profile_circled),
+        title: ("Profile"),
         activeColorPrimary: CupertinoColors.activeBlue,
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),
